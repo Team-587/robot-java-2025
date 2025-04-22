@@ -41,7 +41,7 @@ public final class Configs {
             turningConfig.absoluteEncoder
                     // Invert the turning encoder, since the output shaft rotates in the opposite
                     // direction of the steering motor in the MAXSwerve Module.
-                    .inverted(false)
+                    .inverted(true)
                     .positionConversionFactor(turningFactor) // radians
                     .velocityConversionFactor(turningFactor / 60.0); // radians per second
             turningConfig.closedLoop
