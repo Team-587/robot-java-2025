@@ -7,20 +7,36 @@ package frc.robot.subsystems;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.ctre.phoenix.sensors.PigeonIMU;
+
+import static edu.wpi.first.units.Units.Second;
+
+//import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import com.pathplanner.lib.config.PIDConstants;
+
+
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -43,12 +59,19 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
-
+  
+  public static final SwerveDriveKinematics kDriveKinematics =
+      new SwerveDriveKinematics(
+          new Translation2d(DriveConstants.kWheelBase / 2.0, DriveConstants.kTrackWidth / 2.0), // Front Left
+          new Translation2d(DriveConstants.kWheelBase / 2.0, -DriveConstants.kTrackWidth / 2.0), // Front Right
+          new Translation2d(-DriveConstants.kWheelBase / 2.0, DriveConstants.kTrackWidth / 2.0), // Back Left
+          new Translation2d(-DriveConstants.kWheelBase / 2.0, -DriveConstants.kTrackWidth / 2.0) // Back Right
+      );
   // The gyro sensor
   //Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
   private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
   //pigeon gyro definition (Uncoment when using pidgeon)
-  PigeonIMU m_PigeonIMU = new PigeonIMU(Constants.OIConstants.kPigeonIMUPort);
+  //PigeonIMU m_PigeonIMU = new PigeonIMU(Constants.OIConstants.kPigeonIMUPort);
   private final Pigeon2 pigeon = new Pigeon2(1, "rio");
 
   // Odometry class for tracking robot pose
@@ -61,15 +84,24 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
       });
+  
+
+  PPHolonomicDriveController driveController = new PPHolonomicDriveController(new PIDConstants(7.0, 0.0, 0.0), new PIDConstants(7.0, 0.0, 0.0));
+  RobotConfig config = RobotConfig.fromGUISettings();
+  AutoBuilder autoBuilder = AutoBuilder.configure(this::getPose, this::resetOdometry, this::getSpeeds, (speeds, feedforwards) -> driveRobotRelative(speeds), driveController, config);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+    resetEncoders();
   }
 
   @Override
   public void periodic() {
+
+    SmartDashboard.putNumber("Yaw", pigeon.getRotation2d().getRadians());
+
     // Update the odometry in the periodic block
     m_odometry.update(
         Rotation2d.fromDegrees(pigeon.getRotation2d().getRadians()),
@@ -180,6 +212,17 @@ public class DriveSubsystem extends SubsystemBase {
   public double getHeading() {
     return Rotation2d.fromDegrees(pigeon.getRotation2d().getRadians()).getDegrees();
   }
+
+  public ChassisSpeeds getSpeeds() {
+    return kDriveKinematics.toChassisSpeeds(new SwerveModuleState[] {m_frontLeft.getState(), m_frontRight.getState(), m_rearLeft.getState(), m_rearRight.getState()});
+  }
+
+  void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds){
+    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
+    var targetStates = kDriveKinematics.toSwerveModuleStates(targetSpeeds);
+    setModuleStates(targetStates);
+  }
+    
 
   /**
    * Returns the turn rate of the robot.
