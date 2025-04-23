@@ -16,8 +16,10 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.ctre.phoenix.sensors.PigeonIMU;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -43,7 +45,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   // The gyro sensor
   private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
-
+  //pigeon gyro definition (Uncoment when using pidgeon)
+  PigeonIMU m_PigeonIMU = new PigeonIMU(Constants.OIConstants.kPigeonIMUPort);
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
