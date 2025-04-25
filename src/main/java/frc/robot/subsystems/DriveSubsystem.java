@@ -17,15 +17,23 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.DriverStation;
 import static edu.wpi.first.units.Units.Second;
 
+import java.io.IOException;
+import java.text.ParseException;
+
+import com.ctre.phoenix6.StatusSignal;
 //import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,6 +41,8 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.controllers.PathFollowingController;
+
 import edu.wpi.first.math.controller.PIDController;
 import com.pathplanner.lib.config.PIDConstants;
 
@@ -86,21 +96,51 @@ public class DriveSubsystem extends SubsystemBase {
       });
   
 
-  PPHolonomicDriveController driveController = new PPHolonomicDriveController(new PIDConstants(7.0, 0.0, 0.0), new PIDConstants(7.0, 0.0, 0.0));
-  RobotConfig config = RobotConfig.fromGUISettings();
-  AutoBuilder autoBuilder = AutoBuilder.configure(this::getPose, this::resetOdometry, this::getSpeeds, (speeds, feedforwards) -> driveRobotRelative(speeds), driveController, config);
+  
+  
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    // Usage reporting for MAXSwerve template
-    HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+    PPHolonomicDriveController driveController = new PPHolonomicDriveController(new PIDConstants(7.0, 0.0, 0.0), new PIDConstants(7.0, 0.0, 0.0));
+    RobotConfig config;
+
+    try {
+      config = RobotConfig.fromGUISettings();
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new RuntimeException("BAD SETTINGS FILE");
+    } catch (org.json.simple.parser.ParseException e) {
+      e.printStackTrace();
+      throw new RuntimeException("PARSING ERROR");
+    }
+
+    
+    
+
+    AutoBuilder.configure(
+      this::getPose, 
+      this::resetOdometry, 
+      this::getSpeeds, 
+      (speeds, feedforwards) -> driveRobotRelative(speeds), 
+      driveController, 
+      config,
+      () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+      this
+    );
+
+
+	// Usage reporting for MAXSwerve template
+	HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
     resetEncoders();
+    
   }
 
   @Override
   public void periodic() {
 
     SmartDashboard.putNumber("Yaw", pigeon.getRotation2d().getRadians());
+	SmartDashboard.putNumber("Pitch", pigeon.getPitch().getValueAsDouble());
+	SmartDashboard.putNumber("Roll", pigeon.getRoll().getValueAsDouble());
 
     // Update the odometry in the periodic block
     m_odometry.update(
@@ -150,7 +190,23 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // Convert the commanded speeds into the correct units for the drivetrain
-    double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
+    
+
+	XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+	double rightTriggerValue = (m_driverController.getRightTriggerAxis() * -0.8) + 1.0;
+
+	if(xSpeed < -0.01 && xSpeed > -0.1) {
+		xSpeed = 0.0;
+	}
+	if(ySpeed < 0.01 && ySpeed > 0.01) {
+		ySpeed = 0.0;
+	}
+
+	xSpeed = xSpeed * rightTriggerValue;
+	ySpeed = ySpeed * rightTriggerValue;
+	rot = rot * rightTriggerValue;
+
+	double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
@@ -230,6 +286,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return pigeon.getRate();
+    StatusSignal<AngularVelocity> vel =  pigeon.getAngularVelocityYWorld();
+    return vel.getValueAsDouble();
   }
 }
