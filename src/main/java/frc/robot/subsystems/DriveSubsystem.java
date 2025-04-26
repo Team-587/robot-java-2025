@@ -84,6 +84,10 @@ public class DriveSubsystem extends SubsystemBase {
   //PigeonIMU m_PigeonIMU = new PigeonIMU(Constants.OIConstants.kPigeonIMUPort);
   private final Pigeon2 pigeon = new Pigeon2(1, "rio");
 
+  private final PIDController xController = new PIDController(0, 0, 0);
+  private final PIDController yController = new PIDController(0, 0, 0);
+  private final PIDController headingController = new PIDController(0, 0, 0);
+
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -94,7 +98,6 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
       });
-  
 
   
   
@@ -128,6 +131,7 @@ public class DriveSubsystem extends SubsystemBase {
       this
     );
 
+	headingController.enableContinuousInput(-Math.PI, Math.PI);
 
 	// Usage reporting for MAXSwerve template
 	HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
@@ -289,4 +293,8 @@ public class DriveSubsystem extends SubsystemBase {
     StatusSignal<AngularVelocity> vel =  pigeon.getAngularVelocityYWorld();
     return vel.getValueAsDouble();
   }
+
+//   public void followTrajectory(SwerveSample sample) {
+
+//   }
 }
