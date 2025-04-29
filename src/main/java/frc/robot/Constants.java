@@ -27,6 +27,7 @@ public final class Constants {
     // the robot, rather the allowed maximum speeds
     public static final double kMaxSpeedMetersPerSecond = 3.5;
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
+    public static final int kLEDLength = 69;
 
     // Chassis configuration
     public static final double kTrackWidth = 0.5468;
@@ -90,6 +91,7 @@ public final class Constants {
 	  public static final int kCoDriverControllerPort = 1;
     public static final int kPigeonIMUPort = 2;
     public static final double kDriveDeadband = 0.05;
+    public static final int kLEDPort = 3;
   }
 
   public static final class AutoConstants {
