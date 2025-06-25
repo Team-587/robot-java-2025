@@ -22,13 +22,19 @@ import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.DriverStation;
+
+import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Second;
+
+import com.studica.frc.AHRS;
+import com.studica.frc.AHRS.*;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -83,15 +89,17 @@ public class DriveSubsystem extends SubsystemBase {
   //pigeon gyro definition (Uncoment when using pidgeon)
   //PigeonIMU m_PigeonIMU = new PigeonIMU(Constants.OIConstants.kPigeonIMUPort);
   private final Pigeon2 pigeon = new Pigeon2(1, "rio");
+  private final AHRS navX = new AHRS(NavXComType.kUSB1);
 
-  private final PIDController xController = new PIDController(0, 0, 0);
-  private final PIDController yController = new PIDController(0, 0, 0);
-  private final PIDController headingController = new PIDController(0, 0, 0);
+  private final PIDController xController = new PIDController(9.0, 0, 0);
+  private final PIDController yController = new PIDController(5.0, 0, 0);
+  private final PIDController headingController = new PIDController(0.03, 0, 0);
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
       Rotation2d.fromDegrees(pigeon.getRotation2d().getRadians()),
+      //Rotation2d.fromDegrees(navX.getRotation2d().getRadians()),
       new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
@@ -142,13 +150,20 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
 
-    SmartDashboard.putNumber("Yaw", pigeon.getRotation2d().getRadians());
+  SmartDashboard.putNumber("Yaw", pigeon.getRotation2d().getRadians());
 	SmartDashboard.putNumber("Pitch", pigeon.getPitch().getValueAsDouble());
 	SmartDashboard.putNumber("Roll", pigeon.getRoll().getValueAsDouble());
+
+  //SmartDashboard.putNumber("Yaw", navX.getRotation2d().getRadians());
+  //SmartDashboard.putNumber("Pitch", navX.getPitch());
+  //SmartDashboard.putNumber("Roll", navX.getRoll());
+
+  
 
     // Update the odometry in the periodic block
     m_odometry.update(
         Rotation2d.fromDegrees(pigeon.getRotation2d().getRadians()),
+        //Rotation2d.fromDegrees(navX.getRotation2d().getRadians()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -174,6 +189,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void resetOdometry(Pose2d pose) {
     m_odometry.resetPosition(
         Rotation2d.fromDegrees(pigeon.getRotation2d().getRadians()),
+        //Rotation2d.fromDegrees(navX.getRotation2d().getRadians()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -210,6 +226,8 @@ public class DriveSubsystem extends SubsystemBase {
 	ySpeed = ySpeed * rightTriggerValue;
 	rot = rot * rightTriggerValue;
 
+  SmartDashboard.putNumber("rot", (double)rot);
+
 	double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
@@ -218,6 +236,7 @@ public class DriveSubsystem extends SubsystemBase {
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
                 Rotation2d.fromDegrees(pigeon.getRotation2d().getRadians()))
+                  //Rotation2d.fromRadians(navX.getRotation2d().getRadians()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -262,6 +281,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     pigeon.reset();
+    //navX.reset();
   }
 
   /**
@@ -271,6 +291,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getHeading() {
     return Rotation2d.fromDegrees(pigeon.getRotation2d().getRadians()).getDegrees();
+    //return navX.getRotation2d().getDegrees();
   }
 
   public ChassisSpeeds getSpeeds() {
@@ -290,8 +311,9 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    StatusSignal<AngularVelocity> vel =  pigeon.getAngularVelocityYWorld();
-    return vel.getValueAsDouble();
+    //StatusSignal<AngularVelocity> vel =  pigeon.getAngularVelocityYWorld();
+    return pigeon.getAngularVelocityYWorld().getValueAsDouble();
+    //return navX.getVelocityY();
   }
 
 //   public void followTrajectory(SwerveSample sample) {

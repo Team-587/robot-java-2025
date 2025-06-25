@@ -26,6 +26,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
+import frc.robot.subsystems.AutoAlignLeft;
+import frc.robot.subsystems.AutoAlignRight;
 
 
 /*
@@ -37,6 +39,8 @@ import java.util.List;
 public class RobotContainer extends SubsystemBase {
   // The robot's subsystems
   private final DriveSubsystem m_drive = new DriveSubsystem();
+  private final AutoAlignLeft m_autoAlignLeft = new AutoAlignLeft(m_drive);
+  private final AutoAlignRight m_autoAlignRight = new AutoAlignRight(m_drive);
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -45,6 +49,9 @@ public class RobotContainer extends SubsystemBase {
 
   public Command zeroHeading() {
     return this.runOnce(() -> m_drive.zeroHeading());
+  }
+  public Command setX(){
+    return this.run(() -> m_drive.setX());
   }
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -78,12 +85,15 @@ public class RobotContainer extends SubsystemBase {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    // new JoystickButton(m_driverController, Button.kR1.value)
-    //     .whileTrue(new RunCommand(
-    //         () -> m_robotDrive.setX(),
-    //         m_robotDrive));
+     /*new JoystickButton(m_driverController, Button.kR1.value)
+         .whileTrue(new RunCommand(
+             () -> m_drive.setX(),
+             m_drive));*/
 
-    new JoystickButton(m_coDriverController, XboxController.Button.kStart.value).onTrue(zeroHeading());
+    new JoystickButton(m_driverController, XboxController.Button.kStart.value).onTrue(zeroHeading());
+    new JoystickButton(m_driverController, XboxController.Button.kX.value).whileTrue(setX());
+    new JoystickButton(m_driverController, XboxController.Button.kRightStick.value).whileTrue(m_autoAlignRight);
+    new JoystickButton(m_driverController, XboxController.Button.kLeftStick.value).whileTrue(m_autoAlignLeft);
   }
 
   /**
