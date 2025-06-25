@@ -19,6 +19,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.CoralSubsystem.coralState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -28,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 import frc.robot.subsystems.AutoAlignLeft;
 import frc.robot.subsystems.AutoAlignRight;
+import frc.robot.subsystems.CoralSubsystem;
 
 
 /*
@@ -41,6 +43,7 @@ public class RobotContainer extends SubsystemBase {
   private final DriveSubsystem m_drive = new DriveSubsystem();
   private final AutoAlignLeft m_autoAlignLeft = new AutoAlignLeft(m_drive);
   private final AutoAlignRight m_autoAlignRight = new AutoAlignRight(m_drive);
+  private final CoralSubsystem m_coralSubsystem = new CoralSubsystem();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -52,6 +55,33 @@ public class RobotContainer extends SubsystemBase {
   }
   public Command setX(){
     return this.run(() -> m_drive.setX());
+  }
+  public Command m_coralClimb(){
+    return this.runOnce(() -> m_coralSubsystem.climbMode());
+  }
+  public Command m_stow(){
+    return this.runOnce(() -> m_coralSubsystem.setState(coralState.STOW));
+  }
+  public Command m_level1(){
+    return this.runOnce(() -> m_coralSubsystem.setState(coralState.LEVEL1));
+  }
+  public Command m_level2(){
+    return this.runOnce(() -> m_coralSubsystem.setState(coralState.LEVEL2));
+  }
+  public Command m_level3(){
+    return this.runOnce(() -> m_coralSubsystem.setState(coralState.LEVEL3));
+  }
+  public Command m_level4(){
+    return this.runOnce(() -> m_coralSubsystem.setState(coralState.LEVEL4));
+  }
+  public Command m_algaeLow(){
+    return this.runOnce(() -> m_coralSubsystem.setState(coralState.ALGAE1));
+  }
+  public Command m_algaeHigh(){
+    return this.runOnce(() -> m_coralSubsystem.setState(coralState.ALGAE2));
+  }
+  public Command m_algaeScore(){
+    return this.runOnce(() -> m_coralSubsystem.setState(coralState.ALGAESCORE));
   }
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -94,6 +124,13 @@ public class RobotContainer extends SubsystemBase {
     new JoystickButton(m_driverController, XboxController.Button.kX.value).whileTrue(setX());
     new JoystickButton(m_driverController, XboxController.Button.kRightStick.value).whileTrue(m_autoAlignRight);
     new JoystickButton(m_driverController, XboxController.Button.kLeftStick.value).whileTrue(m_autoAlignLeft);
+    new JoystickButton(m_coDriverController, XboxController.Button.kX.value).onTrue(m_level1());
+    new JoystickButton(m_coDriverController, XboxController.Button.kY.value).onTrue(m_level2());
+    new JoystickButton(m_coDriverController, XboxController.Button.kB.value).onTrue(m_level3());
+    new JoystickButton(m_coDriverController, XboxController.Button.kA.value).onTrue(m_level4());
+    new JoystickButton(m_coDriverController, XboxController.Button.kLeftStick.value).onTrue(m_algaeLow());
+    new JoystickButton(m_coDriverController, XboxController.Button.kRightStick.value).onTrue(m_algaeHigh());
+    new JoystickButton(m_coDriverController, XboxController.Button.kRightBumper.value).onTrue(m_algaeScore());
   }
 
   /**

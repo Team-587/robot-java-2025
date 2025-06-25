@@ -102,6 +102,40 @@ public final class Constants {
     public static final int kLEDPort = 3;
   }
 
+  public static final class CoralConstants {
+    public static final double kUppiesIntakeHeight = 0.1;
+    public static final double kUppiesL1Height = 0.1;
+    public static final double kUppiesClimbHeight = 0.1;
+    public static final double kUppiesL2Height = 9.8;
+    public static final double kUppiesL3Height = 17.7;
+    public static final double kUppiesL4Height = 31.0;
+    public static final double kAlgaeRemoveHeight1 = 10.0;
+    public static final double kAlgaeRemoveHeight2 = 19.5;
+    public static final double kAlgaeScoreHeight = 3.0;
+
+    public static final double kWristIntakeAngle = 85.0;
+    public static final double kWristMoveAngleNoCoral = 135.0;
+    public static final double kWristMoveAngle = 245.0;
+    public static final double kWristL1Angle = 185.0;
+    public static final double kWristClimbAngle = 185.0;
+    public static final double kWristL1AngleAuto = 205.0;
+    public static final double kWristL2Angle = 260.0;
+    public static final double kWristL3Angle = 260.0;
+    public static final double kWristL4Angle = 270.0;
+    public static final double kBallRemoveAngle = 210.0;
+
+    public static final double kHouseIntakeSpeed = 0.30;
+    public static final double kHouseL1Speed = -0.12;
+    public static final double kHouseL2Speed = -0.125;
+    public static final double kHouseL3Speed = -0.125;
+    public static final double kHouseL4Speed = -0.3;
+    public static final double kHouseStowSpeed = -0.3;
+    public static final double kBackspinAuto = 0.15;
+    public static final double kBackspin = 0.10;
+    public static final double kRemoveSpeed = -0.20;
+    public static final double kAlgaeShoot = 0.30;
+  }
+
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 5.9;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;

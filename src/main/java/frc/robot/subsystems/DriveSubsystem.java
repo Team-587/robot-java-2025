@@ -29,6 +29,7 @@ import frc.robot.Constants.OIConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.subsystems.CoralSubsystem;
 
 import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Second;
@@ -107,7 +108,6 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
       });
 
-  
   
 
   /** Creates a new DriveSubsystem. */
