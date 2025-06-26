@@ -5,6 +5,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 
 public final class Configs {
@@ -56,6 +57,56 @@ public final class Configs {
                     // longer route.
                     .positionWrappingEnabled(true)
                     .positionWrappingInputRange(0, turningFactor);
+        }
+    }
+    public static final class CoralSubsystem {
+        public static final SparkMaxConfig wristConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig uppiesConfig1 = new SparkMaxConfig();
+        public static final SparkMaxConfig uppiesConfig2 = new SparkMaxConfig();
+
+        static {
+
+            double turningFactorDegrees = 360;
+            double turningFactorElevator = 1.432 * Math.PI;
+
+            wristConfig
+                    .idleMode(IdleMode.kBrake)
+                    .smartCurrentLimit(60)
+                    .inverted(false);
+            wristConfig
+                    .absoluteEncoder
+                    .inverted(false)
+                    .positionConversionFactor(turningFactorDegrees)
+                    .velocityConversionFactor(turningFactorDegrees / 60.0);
+            wristConfig
+                    .closedLoop
+                    .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+                    .pid(0.00350, 0, 0)
+                    .outputRange(-1, 1)
+                    .positionWrappingEnabled(false);
+                
+            uppiesConfig1
+                    .idleMode(IdleMode.kBrake)
+                    .smartCurrentLimit(50)
+                    .inverted(true);
+            uppiesConfig1
+                    .alternateEncoder
+                    .countsPerRevolution(8192)
+                    .inverted(true)
+                    .positionConversionFactor(turningFactorElevator)
+                    .velocityConversionFactor(turningFactorElevator / 60);
+            uppiesConfig1
+                    .closedLoop
+                    .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
+                    .pid(0.45, 0, 0)
+                    .outputRange(-0.7, 1);
+            
+            uppiesConfig2
+                    .idleMode(IdleMode.kBrake)
+                    .inverted(false)
+                    .smartCurrentLimit(50);
+            uppiesConfig2
+                    .follow(DriveConstants.kUppies1CanId, true);
         }
     }
 }

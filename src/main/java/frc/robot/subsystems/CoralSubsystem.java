@@ -6,15 +6,16 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkMaxAlternateEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkFlex;
-//import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.AlternateEncoderConfig;
 
+import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.Constants.CoralConstants;
 import frc.robot.Constants.DriveConstants;
@@ -75,6 +76,18 @@ public class CoralSubsystem extends SubsystemBase {
 
     shootSpeed = 0.0;
     desiredState = coralState.STOW;
+
+    m_wristMotor.configure(Configs.CoralSubsystem.wristConfig, 
+                           SparkBase.ResetMode.kResetSafeParameters, 
+                           SparkBase.PersistMode.kPersistParameters);
+
+    m_uppiesMotor1.configure(Configs.CoralSubsystem.uppiesConfig1, 
+                             SparkBase.ResetMode.kResetSafeParameters, 
+                             SparkBase.PersistMode.kPersistParameters);
+                             
+    m_uppiesMotor2.configure(Configs.CoralSubsystem.uppiesConfig2, 
+                             SparkBase.ResetMode.kResetSafeParameters, 
+                             SparkBase.PersistMode.kPersistParameters);
   }
 
   @Override
