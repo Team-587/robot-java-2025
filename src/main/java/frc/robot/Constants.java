@@ -60,10 +60,14 @@ public final class Constants {
     public static final int kUppies1CanId = 22;
     public static final int kUppies2CanId = 23;
     public static final int kHouseWristCanId = 24;
-    public static final int kHouseCanId = 26;
+    public static final int kHouseCanId = 25;
+    public static final int kClimberCanId = 26;
 
     public static final int kHouseSwitch = 1;
     public static final int kUppiesSwitch = 2;
+
+    public static final int kHopperServoId = 2;
+    public static final int kClimberServoId = 1;
 
     public static final boolean kGyroReversed = false;
   }

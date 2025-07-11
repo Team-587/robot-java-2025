@@ -30,6 +30,7 @@ import java.util.List;
 import frc.robot.subsystems.AutoAlignLeft;
 import frc.robot.subsystems.AutoAlignRight;
 import frc.robot.subsystems.CoralSubsystem;
+import frc.robot.subsystems.Lights;
 
 
 /*
@@ -44,6 +45,8 @@ public class RobotContainer extends SubsystemBase {
   private final AutoAlignLeft m_autoAlignLeft = new AutoAlignLeft(m_drive);
   private final AutoAlignRight m_autoAlignRight = new AutoAlignRight(m_drive);
   private final CoralSubsystem m_coralSubsystem = new CoralSubsystem();
+  private final Lights m_lights = new Lights();
+  
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
