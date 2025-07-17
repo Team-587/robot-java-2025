@@ -61,7 +61,10 @@ public final class Constants {
     public static final int kUppies2CanId = 23;
     public static final int kHouseWristCanId = 24;
     public static final int kHouseCanId = 25;
+<<<<<<< Updated upstream
     public static final int kClimberCanId = 26;
+=======
+>>>>>>> Stashed changes
 
     public static final int kHouseSwitch = 1;
     public static final int kUppiesSwitch = 2;

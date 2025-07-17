@@ -22,7 +22,7 @@ import edu.wpi.first.units.Units;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoAlignLeft extends Command {
   /** Creates a new AutoAlign. */
-  double DesiredX = -0.4;
+  double DesiredX = -0.47;
   double DesiredY = -0.18;
   double DesiredRot = -1.025;
   
@@ -82,10 +82,12 @@ public class AutoAlignLeft extends Command {
 
     double[] positions;
     positions = LimelightHelpers.getBotPose_TargetSpace("limelight-right");
+    SmartDashboard.putNumber("Y", positions[0]);
+    SmartDashboard.putNumber("X", positions[2]);
     if((id >= 6 && id <= 11) || (id >= 17 && id <= 22)){
-      if(positions[2] < -1.0){
+      if(positions[2] > -1.0){
         m_xController.setP(0.6);
-        m_yController.setP(0.8);
+        m_yController.setP(1.0);
         m_rotController.setP(0.012);
       }else{
         m_xController.setP(0.7);

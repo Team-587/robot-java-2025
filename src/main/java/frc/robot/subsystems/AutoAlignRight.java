@@ -22,7 +22,7 @@ import edu.wpi.first.units.Units;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoAlignRight extends Command {
   /** Creates a new AutoAlign. */
-  double DesiredX = -0.42;
+  double DesiredX = -0.46;
   double DesiredY = 0.19;
   double DesiredRot = -2.5;
   
@@ -50,7 +50,7 @@ public class AutoAlignRight extends Command {
     table = NetworkTableInstance.getDefault().getTable("limelight-left");
     NetworkTableEntry numberEntry = table.getEntry("tid");
     double id = numberEntry.getDouble(0.0);
-
+    
     if((id >= 6 && id <= 11) || (id >= 17 && id <= 22)){
       readyToExit = false;
     }else{
@@ -82,15 +82,17 @@ public class AutoAlignRight extends Command {
 
     double[] positions;
     positions = LimelightHelpers.getBotPose_TargetSpace("limelight-left");
+    SmartDashboard.putNumber("Y", positions[0]);
+    SmartDashboard.putNumber("X", positions[2]);
     if((id >= 6 && id <= 11) || (id >= 17 && id <= 22)){
-      if(positions[2] < -1.0){
-        m_xController.setP(0.4);
-        m_yController.setP(0.8);
+      if(positions[2] > -1.0){
+        m_xController.setP(0.6);
+        m_yController.setP(1.0);
         m_rotController.setP(0.012);
       }else{
-        m_xController.setP(0.8);
+        m_xController.setP(0.7);
         m_yController.setP(1.0);
-        m_rotController.setP(0.008);
+        m_rotController.setP(0.009);
       }
       double xSpeed = m_xController.calculate(positions[2]);
       double ySpeed = -m_yController.calculate(positions[0]);

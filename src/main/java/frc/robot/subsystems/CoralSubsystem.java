@@ -96,6 +96,7 @@ public class CoralSubsystem extends SubsystemBase {
     haveCoral = !m_houseSwitch.get();
     double coDriverRT = m_coDriverController.getRightTriggerAxis();
     double coDriverLT = m_coDriverController.getLeftTriggerAxis();
+    double driverLT = m_driverController.getLeftTriggerAxis();
 
     if(climbActivated){
       m_houseMotor.set(0.0);
@@ -111,7 +112,7 @@ public class CoralSubsystem extends SubsystemBase {
       }
     }else if(coDriverLT > 0.3 && haveCoral == false){
       m_houseMotor.set(CoralConstants.kHouseIntakeSpeed);
-    }else if(coDriverRT > 0.3){
+    }else if(coDriverRT > 0.3 || driverLT > 0.3){
       m_houseMotor.set(shootSpeed);
     }else{
       m_houseMotor.set(CoralConstants.kBackspin);
@@ -120,12 +121,26 @@ public class CoralSubsystem extends SubsystemBase {
     switch (desiredState){
       //STOW
       case STOW:
-        shootSpeed = CoralConstants.kHouseStowSpeed;
-        m_houseMotor.set(CoralConstants.kBackspin);
+        if(coDriverLT > 0.3){
+          m_houseMotor.set(CoralConstants.kHouseIntakeSpeed);
+        }else if(coDriverRT > 0.3){
+          shootSpeed = CoralConstants.kHouseStowSpeed;
+        }else{
+          m_houseMotor.set(CoralConstants.kBackspin);
+        }
         if(haveCoral == true){
           m_wristClosedLoopController.setReference(CoralConstants.kWristMoveAngle, ControlType.kPosition);
           if(checkWristAngle(CoralConstants.kWristMoveAngle)){
             m_uppies1ClosedLoopController.setReference(CoralConstants.kUppiesIntakeHeight, ControlType.kPosition);
+          }
+        }else{
+          if(checkUppiesHeight(CoralConstants.kUppiesIntakeHeight)){
+            m_wristClosedLoopController.setReference(CoralConstants.kWristIntakeAngle, ControlType.kPosition);
+          }else{
+            m_wristClosedLoopController.setReference(CoralConstants.kWristMoveAngleNoCoral, ControlType.kPosition);
+            if(checkWristAngle(CoralConstants.kWristMoveAngleNoCoral)){
+              m_uppies1ClosedLoopController.setReference(CoralConstants.kUppiesIntakeHeight, ControlType.kPosition);
+            }
           }
         }
         break;

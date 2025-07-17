@@ -127,6 +127,7 @@ public class RobotContainer extends SubsystemBase {
     new JoystickButton(m_driverController, XboxController.Button.kX.value).whileTrue(setX());
     new JoystickButton(m_driverController, XboxController.Button.kRightStick.value).whileTrue(m_autoAlignRight);
     new JoystickButton(m_driverController, XboxController.Button.kLeftStick.value).whileTrue(m_autoAlignLeft);
+    new JoystickButton(m_coDriverController, XboxController.Button.kLeftBumper.value).onTrue(m_stow());
     new JoystickButton(m_coDriverController, XboxController.Button.kX.value).onTrue(m_level1());
     new JoystickButton(m_coDriverController, XboxController.Button.kY.value).onTrue(m_level2());
     new JoystickButton(m_coDriverController, XboxController.Button.kB.value).onTrue(m_level3());
@@ -134,6 +135,12 @@ public class RobotContainer extends SubsystemBase {
     new JoystickButton(m_coDriverController, XboxController.Button.kLeftStick.value).onTrue(m_algaeLow());
     new JoystickButton(m_coDriverController, XboxController.Button.kRightStick.value).onTrue(m_algaeHigh());
     new JoystickButton(m_coDriverController, XboxController.Button.kRightBumper.value).onTrue(m_algaeScore());
+
+    new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value).onTrue(m_stow());
+    new JoystickButton(m_driverController, XboxController.Button.kX.value).onTrue(m_level1());
+    new JoystickButton(m_driverController, XboxController.Button.kY.value).onTrue(m_level2());
+    new JoystickButton(m_driverController, XboxController.Button.kB.value).onTrue(m_level3());
+    new JoystickButton(m_driverController, XboxController.Button.kA.value).onTrue(m_level4());
   }
 
   /**
